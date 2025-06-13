@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskMaster - Dashboard</title>
+    <link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+  integrity="sha512-…"
+  crossorigin="anonymous"
+  referrerpolicy="no-referrer"
+/>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+        }
+        a{
+            text-decoration: none;
+            color: black;
+        }
+
+        /* Header Styles */
+        .header {
+            background-color: #fff;  
+            width: 100%;
+            height: 64px;
+            color: black;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            border-bottom: 1px solid #ecedee;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 32px;
+            cursor: pointer;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background-color: #3b82f6;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #2563eb;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background-color: #f3f4f6;
+            /* 薄いグレー背景 */
+            color: #374151;
+            /* 黒に近いグレー文字 */
+            border: 1px solid #d1d5db;
+        }
+
+        .btn-secondary:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Layout */
+        .container {
+            width: 100%;
+            margin: 0 auto;
+            padding-right: 2rem;
+            padding-left: 2rem;
+            padding-bottom: 2rem;
+            padding-top: 64px;
+        }
+
+        .main-layout {
+            display: flex;
+            min-height: calc(100vh - 80px);
+        }
+
+        .sidebar {
+            width: 250px;
+            background: white;
+            box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+              position: fixed;
+            top: 64px;
+            height: 100vh ;
+        }
+
+        .content {
+            flex: 1;
+            background: white;
+            padding-right: 2rem;
+            padding-left: 2rem;
+            overflow-y: auto;
+            padding-top: 2rem;
+             margin-left: 250px;
+        }
+
+        /* Navigation */
+        .nav-menu {
+            list-style: none;
+            padding: 1.5rem 0;
+        }
+
+        .nav-item {
+            margin: 0;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 1rem 1.5rem;
+            color: #374151;
+            text-decoration: none;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 16px;
+            font-weight: 500;
+            border-left: 3px solid transparent;
+            border-radius: 32px;
+        }
+
+
+        .nav-link.active {
+            background-color: #d1ddeb;
+            color: black;
+        }
+        .nav-icon {
+  margin-right: 0.5em;
+  vertical-align: middle;
+}
+
+        /* Content sections */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.all {
+            display: block;
+        }
+
+        /* Table Styles */
+        .task-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1.5rem;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            table-layout: fixed;
+            /* テーブルレイアウトを固定 */
+        }
+
+        .task-table th,
+        .task-table td {
+            padding: 16px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .task-table th {
+            background-color: #f9fafb;
+            font-weight: 600;
+            color: #374151;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .task-table tbody tr:hover {
+            background-color: #f9fafb;
+        }
+
+
+
+        /* カラム幅の固定 */
+        .task-table th:nth-child(1),
+        .task-table td:nth-child(1) {
+            width: 200px;
+            /* タスク名 */
+        }
+
+        .task-table th:nth-child(2),
+        .task-table td:nth-child(2) {
+            width: 400px;
+            /* タスク説明 */
+            white-space: normal;
+            /* 説明は改行を許可 */
+            word-wrap: break-word;
+        }
+
+        .task-table th:nth-child(3),
+        .task-table td:nth-child(3) {
+            width: 150px;
+            /* ステータス */
+            text-align: center;
+        }
+
+        .task-table th:nth-child(4),
+        .task-table td:nth-child(4) {
+            width: 120px;
+            /* アクション */
+            text-align: center;
+        }
+
+        .status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .status-in-progress {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+
+        .status-not-started {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-completed {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .actions {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+        }
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            font-size: 14px;
+            text-decoration: none;
+        }
+
+        .edit-btn {
+            background-color: #3b82f6;
+            color: white;
+        }
+
+        .edit-btn:hover {
+            background-color: #2563eb;
+            transform: scale(1.1);
+        }
+
+        .delete-btn {
+            background-color: white;
+            color: black;
+            border: none;
+            margin-left: 1rem;
+        }
+
+
+        /* Section Headers */
+        .section-header {
+            margin: 2rem 0 1rem 0;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .section-header h2 {
+            color: #1f2937;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .page-title {
+            color: #1f2937;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        /* Notification Styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 1100;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification-success {
+            background-color: #10b981;
+        }
+
+        .notification-error {
+            background-color: #ef4444;
+        }
+
+        .notification-info {
+            background-color: #3b82f6;
+        }
+
+        /* Empty State */
+        .text-center {
+            text-align: center;
+            padding: 2rem;
+            color: #6b7280;
+        }
+
+        .container-title {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Responsive */
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <div class="logo">TaskMaster</div>
+        <div class="header-actions">
+            <a href="../index.html" class="btn btn-secondary">Logout</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="main-layout">
+            <nav class="sidebar">
+                <ul class="nav-menu">
+                   <li class="nav-item">
+    <button class="nav-link active" data-tab="all">
+      <i class="fas fa-list nav-icon"></i>
+      All Tasks
+    </button>
+  </li>
+  <li class="nav-item">
+    <button class="nav-link" data-tab="team1">
+      <i class="fas fa-users nav-icon"></i>
+      Team 1
+    </button>
+  </li>
+  <li class="nav-item">
+    <button class="nav-link" data-tab="team2">
+      <i class="fas fa-clipboard-list nav-icon"></i>
+      Team 2
+    </button>
+  </li>
+                </ul>
+            </nav>
+
+            <main class="content">
+                <!-- All Tasks Content -->
+                <div class="tab-content all">
+                    <div class="container-title">
+                        <h1 class="page-title">All Tasks</h1>
+                        <div><a href="add-task.html" class="btn btn-primary">Add Task</a></div>
+                    </div>
+
+                    <div class="section-header">
+                        <h2>Team 1</h2>
+                    </div>
+                    <table class="task-table team1-table">
+                        <thead>
+                            <tr>
+                                <th>Task</th>
+                                <th>Task Description</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Team 1 tasks will be rendered here -->
+                        </tbody>
+                    </table>
+
+                    <div class="section-header">
+                        <h2>Team 2</h2>
+                    </div>
+                    <table class="task-table team2-table">
+                        <thead>
+                            <tr>
+                                <th>Task</th>
+                                <th>Task Description</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Team 2 tasks will be rendered here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Team 1 Content -->
+                <div class="tab-content team1">
+                    <div class="container-title">
+                        <h1 class="page-title">Team 1</h1>
+                        <div><a href="add-task.html" class="btn btn-primary">Add Task</a></div>
+                    </div>
+
+                    <table class="task-table">
+                        <thead>
+                            <tr>
+                                <th>Task</th>
+                                <th>Task Description</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Team 1 tasks will be rendered here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Team 2 Content -->
+                <div class="tab-content team2">
+                    <div class="container-title">
+                        <h1 class="page-title">Team2</h1>
+                        <div><a href="add-task.html" class="btn btn-primary">Add Task</a></div>
+                    </div>
+
+                    <table class="task-table">
+                        <thead>
+                            <tr>
+                                <th>Task</th>
+                                <th>Task Description</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Team 2 tasks will be rendered here -->
+                        </tbody>
+                    </table>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="../js/app.js"></script>
+</body>
+
+</html>
